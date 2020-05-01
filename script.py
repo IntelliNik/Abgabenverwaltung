@@ -4,38 +4,57 @@
 import os
 import re
 import sys
+import random
 
-dir_exercises = "abgaben"
-list_exercises = os.listdir(dir_exercises)
+dir_list = os.listdir("abgaben")
 
+group_numbers = []
 tutors = ["Alex","Bernd","Christoph","Detlef","Elmar"]
+random.shuffle(tutors)
 
 def remove_duplicates(x):
-  return list(dict.fromkeys(x))
+    return list(dict.fromkeys(x))
 
-def einteilen():
-    groups = []
+for dir in dir_list:
+    group_numbers.append(re.search("Abgabegruppe [0-9]+",dir).group(0).split()[1]) # get the group numbers
+group_numbers = remove_duplicates(group_numbers)
 
-    for list in list_exercises:
-        groups.append(re.search("Abgabegruppe [0-9]+",list).group(0).split()[1]) # get the group numbers
-    
-    groups = remove_duplicates(groups)
+print("--- ABGABENVERWALTUNG ---")
+print("Tutors: " + str(tutors))
+print("Group numbers: " + str(group_numbers))
 
-    exercises_perTutor = len(groups) // len(tutors)
-    remaining = len(groups) % len(tutors)
+exercises_perTutor = len(group_numbers) // len(tutors)
+remaining = len(group_numbers) % len(tutors)
+print("There are " + str(len(group_numbers)) + " groups. ", end="")
+print("Therefore every Tutor gets " + str(exercises_perTutor) + " exercises with " + str(remaining) + " exercises remaining")
 
-    print("There are " + str(len(groups)) + " groups.")
-
-    count = 0
-    for tutor in tutors:
-        print("Tutor " + tutor + " gets groups " )
-        for x in range(count*exercises_perTutor,exercises_perTutor*count+exercises_perTutor):
-            print(groups[x]+" ", end='')
-        print("")
-        count = count + 1
-
+unlucky = random.sample(tutors,remaining)
+print("and fate decides " + str(unlucky) + " get +1 exercises")
 
 def austeilen():
+    print()
+    print("--- AUSTEILEN ---")
+    index_groups = 0
+    index_groups_start = 0
+    index_tutor = 0
+    
+    for tutor in tutors:
+        ex_tutor = []
+        if tutor in unlucky:
+            while index_groups < index_groups_start+exercises_perTutor+1:
+                ex_tutor.append(group_numbers[index_groups])
+                index_groups += 1
+        else:
+            while index_groups < index_groups_start+exercises_perTutor:
+                ex_tutor.append(group_numbers[index_groups])
+                index_groups += 1
+
+        index_groups_start = index_groups
+        print("Tutor " + str(tutors[index_tutor]) + " gets groups " + str(ex_tutor)) 
+        index_tutor += 1
+        
+
+def einteilen():
     print()
 
 
